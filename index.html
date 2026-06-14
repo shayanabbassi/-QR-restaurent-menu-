@@ -374,38 +374,75 @@ const CONFIG = {
   // ---- THE MENU ----
   // veg:true shows a green dot · spicy:true shows a chilli mark
   menu: [
-    { cat:"Breakfast", note:"Served 7:00–11:00 AM", items:[
-      { name:"Paramo Desi Nashta", desc:"Halwa puri, channay, fresh seasonal achaar & lassi", price:650 },
-      { name:"Cheese & Herb Omelette", desc:"Three eggs, mountain herbs, buttered toast", price:480, veg:true },
-      { name:"Aloo / Qeema Paratha", desc:"Stuffed paratha with mint raita & butter", price:420 },
-      { name:"Honey Pancake Stack", desc:"Buttermilk pancakes, local honey, banana", price:520, veg:true },
+    { cat:"Breakfast", note:"", items:[
+      { name:"Paratha", price:150, veg:true },
+      { name:"Omelet", price:200 },
+      { name:"Fried Egg", price:180 },
+      { name:"Boiled Egg", price:150 },
+      { name:"Cheese Omelet", price:350 },
+      { name:"French Toast", price:350 },
+      { name:"Bread Basket", price:350, veg:true },
+      { name:"Coffee", price:450, veg:true },
+      { name:"Green Tea", price:150, veg:true },
+      { name:"Mix Tea", price:250, veg:true },
+      { name:"Aloo Ki Bhujia", price:1000, veg:true },
+      { name:"Chana", price:1200, veg:true },
     ]},
-    { cat:"From the Karahi", note:"Our house specialities", items:[
-      { name:"Chicken Karahi (Full)", desc:"Tomato & green chilli, slow-cooked, serves 2–3", price:1750, spicy:true },
-      { name:"Mutton Karahi (Full)", desc:"Tender mutton, ginger julienne, serves 2–3", price:2650, spicy:true },
-      { name:"Chicken Handi", desc:"Creamy white handi with naan", price:1450 },
-      { name:"Daal Makhani", desc:"Black lentils simmered overnight with butter", price:780, veg:true },
+    { cat:"Hi-Tea", note:"", items:[
+      { name:"Chicken Sandwich", price:500 },
+      { name:"Club Sandwich", price:850 },
+      { name:"Chicken Burger", price:480 },
+      { name:"Chicken Cheese Burger", price:600 },
+      { name:"Egg Sandwich", price:480 },
+      { name:"Nuggets (6 Pieces)", price:600 },
+      { name:"Fries", price:450, veg:true },
+      { name:"Pakora", price:800, veg:true },
     ]},
-    { cat:"BBQ & Grill", note:"", items:[
-      { name:"Chicken Malai Boti (6 pcs)", desc:"Char-grilled, creamy marinade", price:980 },
-      { name:"Seekh Kebab (4 pcs)", desc:"Hand-minced beef, fresh coriander", price:720, spicy:true },
-      { name:"Grilled Trout", desc:"Whole river trout, lemon butter, fresh from the hills", price:1650 },
+    { cat:"Pakistani Cuisine", note:"", items:[
+      { name:"Chicken Karahi", price:2800, spicy:true },
+      { name:"Chicken White Qorma", price:2800 },
+      { name:"Chicken Ginger", price:2500 },
+      { name:"Chicken Handi", price:2500 },
+      { name:"Chicken Jalfrezi", price:2600, spicy:true },
+      { name:"Chicken White Handi", price:2600 },
+      { name:"Daal Mash", price:800, veg:true },
+      { name:"Mix Vegetable", price:750, veg:true },
+      { name:"Chapati", price:50, veg:true },
     ]},
-    { cat:"Breads & Rice", note:"", items:[
-      { name:"Garlic Naan", desc:"Tandoor-fresh", price:120, veg:true },
-      { name:"Roghni Naan", desc:"Sesame topped", price:150, veg:true },
-      { name:"Kashmiri Pulao", desc:"Saffron rice, dry fruit & nuts", price:560, veg:true },
+    { cat:"Chinese Cuisine", note:"", items:[
+      { name:"Chicken Manchurian", price:2600 },
+      { name:"Chicken Shashlik", price:2600 },
+      { name:"Almond Chicken", price:2800 },
+      { name:"Black Pepper Chicken", price:2200 },
+      { name:"Chicken Spaghetti", price:1800 },
+      { name:"Chicken Pasta", price:1500 },
     ]},
-    { cat:"Beverages", note:"", items:[
-      { name:"Kashmiri Chai", desc:"Pink salt tea, crushed pistachio", price:280, veg:true },
-      { name:"Masala Doodh Patti", desc:"Strong milk tea, served in a pot", price:220, veg:true },
-      { name:"Fresh Lime & Mint", desc:"Iced, lightly sweetened", price:260, veg:true },
-      { name:"Mineral Water (1.5L)", desc:"", price:120, veg:true },
+    { cat:"Soup", note:"", items:[
+      { name:"Hot & Sour Soup", price:2200 },
+      { name:"Corn Soup", price:1800 },
+      { name:"Paramo Special Soup", price:2500 },
+    ]},
+    { cat:"Rice", note:"", items:[
+      { name:"Chicken Fried Rice", price:850 },
+      { name:"Egg Fried Rice", price:750 },
+      { name:"Masala Rice", price:750, veg:true },
+      { name:"Chicken Biryani", price:2700 },
+      { name:"Chicken Pulao", price:2400 },
+      { name:"Vegetable Rice", price:800, veg:true },
+    ]},
+    { cat:"Sides", note:"", items:[
+      { name:"Green Salad", price:500, veg:true },
+      { name:"Special Zeera Raita", price:500, veg:true },
+      { name:"Special Mint Sauce", price:500, veg:true },
     ]},
     { cat:"Desserts", note:"", items:[
-      { name:"Warm Gajar Halwa", desc:"Carrot halwa, khoya, almonds", price:380, veg:true },
-      { name:"Shahi Tukray", desc:"Saffron bread pudding", price:340, veg:true },
-      { name:"Vanilla Kulfi", desc:"Traditional frozen dessert", price:240, veg:true },
+      { name:"Kheer Mix Family Bowl", price:3000, veg:true },
+      { name:"Custard", price:2000, veg:true },
+      { name:"Fruit Trifle", price:3000, veg:true },
+    ]},
+    { cat:"Beverages", note:"", items:[
+      { name:"Cold Drink", price:380, veg:true },
+      { name:"Mineral Water", price:220, veg:true },
     ]},
   ]
 };
@@ -626,6 +663,7 @@ const CONFIG = {
       if(LIVE){
         await fetch(CONFIG.endpoint,{
           method:"POST",
+          mode:"no-cors",
           // text/plain keeps it a "simple" request → no CORS preflight with Apps Script
           headers:{"Content-Type":"text/plain;charset=utf-8"},
           body: JSON.stringify(payload)
