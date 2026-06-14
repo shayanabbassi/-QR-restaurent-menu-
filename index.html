@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Paramo Residence — Order</title>
+
+<!-- ============================================================
+     PARAMO RESIDENCE — QR ORDERING PAGE
+     ------------------------------------------------------------
+     EVERYTHING YOU EDIT LIVES IN THE <script id="config"> BLOCK
+     NEAR THE BOTTOM. Business name, contacts, the Google Sheet
+     endpoint URL, and the full menu are all there.
+     ============================================================ -->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<style>
+  :root{
+    --forest:#1f3d2b;
+    --forest-deep:#16301f;
+    --gold:#c2a24c;
+    --gold-soft:#d8c285;
+    --ivory:#f7f4 ec;
+    --ivory:#f7f4ec;
+    --cream:#efe9da;
+    --ink:#26261f;
+    --muted:#6f6d61;
+    --line:#e2dcc9;
+    --white:#fffdf8;
+    --danger:#a23b2c;
+    --ok:#2f6b46;
+    --radius:14px;
+    --shadow:0 8px 30px rgba(31,61,43,.10);
+    --shadow-lg:0 18px 50px rgba(22,48,31,.22);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--ivory);
+    color:var(--ink);
+    font-family:'Inter',system-ui,sans-serif;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+    padding-bottom:96px;
+  }
+  img{max-width:100%;display:block}
+  button{font-family:inherit;cursor:pointer;border:none;background:none}
+
+  /* ---------- Header ---------- */
+  .topbar{
+    background:var(--forest);
+    color:var(--white);
+    padding:26px 20px 22px;
+    position:relative;
+    overflow:hidden;
+  }
+  .topbar::after{
+    content:"";position:absolute;left:0;right:0;bottom:0;height:3px;
+    background:linear-gradient(90deg,transparent,var(--gold),transparent);
+  }
+  .peaks{position:absolute;top:0;right:-10px;opacity:.18;width:190px}
+  .eyebrow{
+    font-size:11px;letter-spacing:.32em;text-transform:uppercase;
+    color:var(--gold-soft);font-weight:600;margin:0 0 6px;
+  }
+  .brand{
+    font-family:'Fraunces',serif;font-weight:500;font-size:32px;
+    line-height:1.05;margin:0;letter-spacing:.01em;
+  }
+  .tagline{
+    font-family:'Fraunces',serif;font-style:italic;font-weight:400;
+    font-size:15px;color:var(--gold-soft);margin:7px 0 0;
+  }
+  .loc{
+    display:flex;align-items:center;gap:6px;margin-top:12px;
+    font-size:12.5px;color:rgba(255,255,255,.72);
+  }
+  .loc svg{width:13px;height:13px;flex:none}
+
+  /* ---------- Order type ---------- */
+  .ordertype{
+    display:flex;gap:8px;padding:16px 20px 4px;
+    max-width:760px;margin:0 auto;
+  }
+  .ot-btn{
+    flex:1;border:1.5px solid var(--line);background:var(--white);
+    border-radius:11px;padding:11px 6px 9px;text-align:center;
+    transition:.18s;color:var(--muted);
+  }
+  .ot-btn .ot-ic{font-size:18px;line-height:1;display:block;margin-bottom:4px}
+  .ot-btn .ot-lb{font-size:12px;font-weight:600;letter-spacing:.01em}
+  .ot-btn.active{
+    border-color:var(--forest);background:var(--forest);color:var(--white);
+    box-shadow:var(--shadow);
+  }
+
+  /* ---------- Category nav ---------- */
+  .catnav{
+    position:sticky;top:0;z-index:30;background:var(--ivory);
+    border-bottom:1px solid var(--line);
+    padding:12px 0 11px;
+  }
+  .catnav-inner{
+    display:flex;gap:8px;overflow-x:auto;padding:0 20px;
+    max-width:760px;margin:0 auto;scrollbar-width:none;
+  }
+  .catnav-inner::-webkit-scrollbar{display:none}
+  .chip{
+    white-space:nowrap;border:1px solid var(--line);background:var(--white);
+    color:var(--muted);font-size:13px;font-weight:600;
+    padding:8px 15px;border-radius:999px;transition:.15s;
+  }
+  .chip.active{background:var(--forest);color:var(--white);border-color:var(--forest)}
+
+  /* ---------- Menu ---------- */
+  main{max-width:760px;margin:0 auto;padding:8px 20px 20px}
+  .cat-title{
+    font-family:'Fraunces',serif;font-size:22px;font-weight:500;
+    color:var(--forest);margin:26px 0 4px;display:flex;align-items:center;gap:10px;
+  }
+  .cat-title::after{content:"";flex:1;height:1px;background:var(--line)}
+  .cat-note{font-size:12.5px;color:var(--muted);margin:0 0 14px}
+
+  .item{
+    display:flex;gap:14px;padding:16px 0;border-bottom:1px solid var(--line);
+    align-items:flex-start;
+  }
+  .item-body{flex:1;min-width:0}
+  .item-name{font-size:15.5px;font-weight:600;margin:0 0 3px;color:var(--ink)}
+  .item-desc{font-size:13px;color:var(--muted);margin:0 0 9px;line-height:1.45}
+  .item-price{font-size:14px;font-weight:700;color:var(--forest)}
+  .item-price .cur{font-size:11px;font-weight:600;color:var(--gold);margin-right:2px}
+  .veg{display:inline-block;width:9px;height:9px;border:1.5px solid var(--ok);
+    border-radius:2px;position:relative;margin-right:5px;vertical-align:middle}
+  .veg::after{content:"";position:absolute;inset:1.5px;background:var(--ok);border-radius:50%}
+  .spicy{font-size:11px;color:var(--danger);margin-left:6px;font-weight:600}
+
+  .item-add{flex:none;align-self:center}
+  .add-btn{
+    border:1.5px solid var(--forest);color:var(--forest);background:var(--white);
+    font-weight:600;font-size:13px;border-radius:10px;padding:9px 16px;
+    transition:.15s;min-width:74px;
+  }
+  .add-btn:active{transform:scale(.96)}
+  .stepper{
+    display:flex;align-items:center;gap:0;border:1.5px solid var(--forest);
+    border-radius:10px;overflow:hidden;background:var(--forest);
+  }
+  .stepper button{
+    width:34px;height:36px;color:var(--white);font-size:20px;font-weight:600;
+    display:grid;place-items:center;
+  }
+  .stepper .qty{min-width:30px;text-align:center;background:var(--white);
+    color:var(--forest);font-weight:700;font-size:14px;height:36px;
+    display:grid;place-items:center}
+
+  /* ---------- Sticky cart bar ---------- */
+  .cartbar{
+    position:fixed;left:0;right:0;bottom:0;z-index:40;
+    transform:translateY(120%);transition:transform .28s cubic-bezier(.2,.8,.2,1);
+    padding:0 14px calc(14px + env(safe-area-inset-bottom));
+  }
+  .cartbar.show{transform:translateY(0)}
+  .cartbar-inner{
+    max-width:760px;margin:0 auto;background:var(--forest);color:var(--white);
+    border-radius:14px;padding:13px 16px;display:flex;align-items:center;
+    justify-content:space-between;box-shadow:var(--shadow-lg);
+    border:1px solid rgba(255,255,255,.08);
+  }
+  .cb-left{display:flex;flex-direction:column}
+  .cb-count{font-size:11.5px;color:var(--gold-soft);font-weight:600;letter-spacing:.02em}
+  .cb-total{font-size:18px;font-weight:700;font-family:'Fraunces',serif}
+  .cb-go{
+    background:var(--gold);color:var(--forest-deep);font-weight:700;font-size:14px;
+    padding:11px 20px;border-radius:10px;display:flex;align-items:center;gap:8px;
+  }
+  .cb-go:active{transform:scale(.97)}
+
+  /* ---------- Drawer / cart ---------- */
+  .scrim{
+    position:fixed;inset:0;background:rgba(22,48,31,.45);z-index:50;
+    opacity:0;pointer-events:none;transition:.25s;backdrop-filter:blur(2px);
+  }
+  .scrim.show{opacity:1;pointer-events:auto}
+  .sheet{
+    position:fixed;left:0;right:0;bottom:0;z-index:60;background:var(--ivory);
+    border-radius:20px 20px 0 0;max-height:92vh;overflow-y:auto;
+    transform:translateY(100%);transition:transform .3s cubic-bezier(.2,.8,.2,1);
+    box-shadow:var(--shadow-lg);
+  }
+  .sheet.show{transform:translateY(0)}
+  .sheet-inner{max-width:760px;margin:0 auto;padding:8px 20px 28px}
+  .grab{width:40px;height:4px;background:var(--line);border-radius:2px;margin:10px auto 6px}
+  .sheet-head{display:flex;align-items:center;justify-content:space-between;
+    padding:6px 0 14px;border-bottom:1px solid var(--line);position:sticky;top:0;
+    background:var(--ivory);z-index:2}
+  .sheet-title{font-family:'Fraunces',serif;font-size:22px;font-weight:500;color:var(--forest);margin:0}
+  .close-x{font-size:24px;color:var(--muted);width:36px;height:36px;display:grid;place-items:center}
+
+  .line{display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid var(--line)}
+  .line-body{flex:1;min-width:0}
+  .line-name{font-size:14.5px;font-weight:600;margin:0}
+  .line-price{font-size:12.5px;color:var(--muted);margin:2px 0 0}
+  .line-sub{font-size:14px;font-weight:700;color:var(--forest);min-width:64px;text-align:right}
+  .mini-step{display:flex;align-items:center;border:1px solid var(--line);border-radius:8px;background:var(--white)}
+  .mini-step button{width:30px;height:30px;color:var(--forest);font-size:17px;font-weight:600;display:grid;place-items:center}
+  .mini-step .q{min-width:24px;text-align:center;font-weight:700;font-size:13px}
+
+  .empty{text-align:center;padding:48px 20px;color:var(--muted)}
+  .empty .e-ic{font-size:40px;margin-bottom:10px;opacity:.5}
+
+  /* ---------- Form ---------- */
+  .form-grp{margin-top:16px}
+  .form-grp label{display:block;font-size:12.5px;font-weight:600;color:var(--ink);margin-bottom:6px}
+  .form-grp .req{color:var(--danger)}
+  .field{
+    width:100%;border:1.5px solid var(--line);background:var(--white);
+    border-radius:10px;padding:12px 13px;font-size:15px;font-family:inherit;color:var(--ink);
+    transition:.15s;
+  }
+  .field:focus{outline:none;border-color:var(--forest);box-shadow:0 0 0 3px rgba(31,61,43,.08)}
+  textarea.field{resize:vertical;min-height:64px}
+  .field.err{border-color:var(--danger);box-shadow:0 0 0 3px rgba(162,59,44,.08)}
+  .field-hint{font-size:11.5px;color:var(--muted);margin-top:5px}
+
+  .summary{margin-top:18px;padding:15px;background:var(--cream);border-radius:12px}
+  .sum-row{display:flex;justify-content:space-between;font-size:13.5px;padding:3px 0;color:var(--muted)}
+  .sum-row.total{border-top:1px dashed var(--line);margin-top:8px;padding-top:10px;
+    font-size:17px;font-weight:700;color:var(--forest);font-family:'Fraunces',serif}
+
+  .place-btn{
+    width:100%;margin-top:18px;background:var(--forest);color:var(--white);
+    font-size:16px;font-weight:700;padding:15px;border-radius:12px;
+    display:flex;align-items:center;justify-content:center;gap:9px;transition:.15s;
+  }
+  .place-btn:active{transform:scale(.99)}
+  .place-btn:disabled{opacity:.6}
+  .spinner{width:18px;height:18px;border:2.5px solid rgba(255,255,255,.35);
+    border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* ---------- Success ---------- */
+  .success{text-align:center;padding:30px 10px 14px}
+  .check{width:72px;height:72px;border-radius:50%;background:var(--ok);color:#fff;
+    display:grid;place-items:center;margin:0 auto 18px;font-size:36px;
+    animation:pop .4s cubic-bezier(.2,1.4,.4,1)}
+  @keyframes pop{from{transform:scale(0)}to{transform:scale(1)}}
+  .success h2{font-family:'Fraunces',serif;font-size:25px;color:var(--forest);margin:0 0 6px}
+  .success p{color:var(--muted);font-size:14px;margin:0 0 4px}
+  .ordernum{display:inline-block;margin-top:14px;background:var(--cream);
+    border:1px dashed var(--gold);border-radius:10px;padding:9px 18px;
+    font-weight:700;color:var(--forest);letter-spacing:.06em;font-size:15px}
+  .demo-tag{display:inline-block;margin-top:14px;font-size:11.5px;color:var(--danger);
+    background:rgba(162,59,44,.08);padding:4px 10px;border-radius:6px}
+
+  /* ---------- Footer / QR ---------- */
+  footer{text-align:center;padding:30px 20px 26px;color:var(--muted);font-size:12px}
+  .qr-link{color:var(--forest);font-weight:600;text-decoration:underline;
+    text-underline-offset:3px;background:none;font-size:12.5px}
+  .qr-card{margin-top:18px;display:none}
+  .qr-card.show{display:block}
+  .qr-box{background:#fff;border:1px solid var(--line);border-radius:16px;
+    padding:22px;max-width:300px;margin:0 auto;box-shadow:var(--shadow)}
+  .qr-box .brand-sm{font-family:'Fraunces',serif;font-size:19px;color:var(--forest);margin:0 0 2px}
+  .qr-box .sub-sm{font-size:11px;color:var(--muted);margin:0 0 16px;letter-spacing:.04em;text-transform:uppercase}
+  #qrcode{display:flex;justify-content:center;margin:0 0 14px}
+  #qrcode img,#qrcode canvas{border-radius:6px}
+  .qr-box .scan-cta{font-size:13px;font-weight:600;color:var(--forest);margin:0}
+  .qr-actions{margin-top:14px;display:flex;gap:8px;justify-content:center}
+  .qr-actions button{font-size:12.5px;font-weight:600;border:1px solid var(--line);
+    background:var(--white);color:var(--forest);padding:8px 14px;border-radius:8px}
+
+  @media print{
+    body>*{display:none!important}
+    .qr-card{display:block!important;margin:0 auto}
+    .qr-actions{display:none!important}
+  }
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+  @media (min-width:760px){
+    .topbar{padding:34px 20px 28px}
+    .brand{font-size:38px}
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <svg class="peaks" viewBox="0 0 200 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M0 90 L45 28 L72 60 L110 12 L150 55 L200 18 L200 90 Z" fill="#c2a24c"/>
+  </svg>
+  <p class="eyebrow" id="hEyebrow">In-Room Dining</p>
+  <h1 class="brand" id="hBrand">Paramo Residence</h1>
+  <p class="tagline" id="hTagline">A mountain retreat above the clouds</p>
+  <div class="loc">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+    <span id="hLoc">Jhika Gali, Murree</span>
+  </div>
+</header>
+
+<div class="ordertype" id="orderType"></div>
+<nav class="catnav"><div class="catnav-inner" id="catNav"></div></nav>
+<main id="menu"></main>
+
+<footer>
+  <button class="qr-link" id="qrToggle">Show QR code for this page</button>
+  <div class="qr-card" id="qrCard">
+    <div class="qr-box">
+      <p class="brand-sm" id="qrBrand">Paramo Residence</p>
+      <p class="sub-sm">Scan to order</p>
+      <div id="qrcode"></div>
+      <p class="scan-cta">Point your camera here to view the menu &amp; order</p>
+    </div>
+    <div class="qr-actions">
+      <button id="qrPrint">Print this QR</button>
+      <button id="qrCopy">Copy link</button>
+    </div>
+  </div>
+  <p style="margin-top:22px">Powered by Paramo Residence · Murree</p>
+</footer>
+
+<!-- Sticky cart bar -->
+<div class="cartbar" id="cartBar">
+  <div class="cartbar-inner" id="cartBarInner">
+    <div class="cb-left">
+      <span class="cb-count" id="cbCount">0 items</span>
+      <span class="cb-total" id="cbTotal">Rs 0</span>
+    </div>
+    <button class="cb-go">View order
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- Cart sheet -->
+<div class="scrim" id="scrim"></div>
+<div class="sheet" id="sheet">
+  <div class="sheet-inner">
+    <div class="grab"></div>
+    <div class="sheet-head">
+      <h2 class="sheet-title" id="sheetTitle">Your order</h2>
+      <button class="close-x" id="closeSheet">&times;</button>
+    </div>
+    <div id="sheetBody"></div>
+  </div>
+</div>
+
+<!-- ============================================================
+     CONFIG — EDIT THIS BLOCK ONLY
+     ============================================================ -->
+<script id="config">
+const CONFIG = {
+  businessName: "Paramo Residence",
+  eyebrow: "In-Room Dining",
+  tagline: "A mountain retreat above the clouds",
+  location: "Jhika Gali, Murree",
+  currency: "Rs",            // shown before prices
+
+  // ---- PASTE YOUR GOOGLE APPS SCRIPT URL HERE (see the setup guide) ----
+  // While it still says PASTE_YOUR..., the page runs in DEMO mode
+  // (orders show success but are NOT saved). Replace it to go live.
+  endpoint: "https://script.google.com/macros/s/AKfycbxW1xBFczrw6RVfsEL67TQiXQakkZX_5sSXgZqMV1SdcgE-29qwEeRHDNSpGRmySpubVg/exec",
+
+  // Order types. "field" is what the customer is asked for.
+  orderTypes: [
+    { id:"room",     label:"Room Service", icon:"🛎️", field:"Room number",  fieldHint:"e.g. 204" },
+    { id:"dinein",   label:"Dine-in",      icon:"🍽️", field:"Table number",  fieldHint:"e.g. T-6" },
+    { id:"takeaway", label:"Takeaway",     icon:"🥡", field:"",              fieldHint:"" }
+  ],
+
+  // ---- THE MENU ----
+  // veg:true shows a green dot · spicy:true shows a chilli mark
+  menu: [
+    { cat:"Breakfast", note:"Served 7:00–11:00 AM", items:[
+      { name:"Paramo Desi Nashta", desc:"Halwa puri, channay, fresh seasonal achaar & lassi", price:650 },
+      { name:"Cheese & Herb Omelette", desc:"Three eggs, mountain herbs, buttered toast", price:480, veg:true },
+      { name:"Aloo / Qeema Paratha", desc:"Stuffed paratha with mint raita & butter", price:420 },
+      { name:"Honey Pancake Stack", desc:"Buttermilk pancakes, local honey, banana", price:520, veg:true },
+    ]},
+    { cat:"From the Karahi", note:"Our house specialities", items:[
+      { name:"Chicken Karahi (Full)", desc:"Tomato & green chilli, slow-cooked, serves 2–3", price:1750, spicy:true },
+      { name:"Mutton Karahi (Full)", desc:"Tender mutton, ginger julienne, serves 2–3", price:2650, spicy:true },
+      { name:"Chicken Handi", desc:"Creamy white handi with naan", price:1450 },
+      { name:"Daal Makhani", desc:"Black lentils simmered overnight with butter", price:780, veg:true },
+    ]},
+    { cat:"BBQ & Grill", note:"", items:[
+      { name:"Chicken Malai Boti (6 pcs)", desc:"Char-grilled, creamy marinade", price:980 },
+      { name:"Seekh Kebab (4 pcs)", desc:"Hand-minced beef, fresh coriander", price:720, spicy:true },
+      { name:"Grilled Trout", desc:"Whole river trout, lemon butter, fresh from the hills", price:1650 },
+    ]},
+    { cat:"Breads & Rice", note:"", items:[
+      { name:"Garlic Naan", desc:"Tandoor-fresh", price:120, veg:true },
+      { name:"Roghni Naan", desc:"Sesame topped", price:150, veg:true },
+      { name:"Kashmiri Pulao", desc:"Saffron rice, dry fruit & nuts", price:560, veg:true },
+    ]},
+    { cat:"Beverages", note:"", items:[
+      { name:"Kashmiri Chai", desc:"Pink salt tea, crushed pistachio", price:280, veg:true },
+      { name:"Masala Doodh Patti", desc:"Strong milk tea, served in a pot", price:220, veg:true },
+      { name:"Fresh Lime & Mint", desc:"Iced, lightly sweetened", price:260, veg:true },
+      { name:"Mineral Water (1.5L)", desc:"", price:120, veg:true },
+    ]},
+    { cat:"Desserts", note:"", items:[
+      { name:"Warm Gajar Halwa", desc:"Carrot halwa, khoya, almonds", price:380, veg:true },
+      { name:"Shahi Tukray", desc:"Saffron bread pudding", price:340, veg:true },
+      { name:"Vanilla Kulfi", desc:"Traditional frozen dessert", price:240, veg:true },
+    ]},
+  ]
+};
+</script>
+
+<!-- ============================================================
+     APP LOGIC — no need to edit below
+     ============================================================ -->
+<script>
+(function(){
+  const $  = (s,el=document)=>el.querySelector(s);
+  const $$ = (s,el=document)=>[...el.querySelectorAll(s)];
+  const cur = CONFIG.currency;
+  const money = n => cur + " " + n.toLocaleString("en-PK");
+  const LIVE = !CONFIG.endpoint.includes("PASTE_YOUR");
+
+  // flatten items with a stable id
+  const ITEMS = {};
+  CONFIG.menu.forEach((c,ci)=>c.items.forEach((it,ii)=>{
+    it.id = "i"+ci+"_"+ii; it.cat = c.cat; ITEMS[it.id]=it;
+  }));
+
+  const cart = {};            // id -> qty
+  let activeType = CONFIG.orderTypes[0].id;
+
+  // ---- Header ----
+  $("#hBrand").textContent   = CONFIG.businessName;
+  $("#hEyebrow").textContent = CONFIG.eyebrow;
+  $("#hTagline").textContent = CONFIG.tagline;
+  $("#hLoc").textContent     = CONFIG.location;
+  $("#qrBrand").textContent  = CONFIG.businessName;
+  document.title = CONFIG.businessName + " — Order";
+
+  // ---- Order type buttons ----
+  $("#orderType").innerHTML = CONFIG.orderTypes.map(t=>
+    `<button class="ot-btn ${t.id===activeType?'active':''}" data-type="${t.id}">
+      <span class="ot-ic">${t.icon}</span><span class="ot-lb">${t.label}</span>
+    </button>`).join("");
+  $$("#orderType .ot-btn").forEach(b=>b.onclick=()=>{
+    activeType=b.dataset.type;
+    $$("#orderType .ot-btn").forEach(x=>x.classList.toggle("active",x.dataset.type===activeType));
+  });
+
+  // ---- Category nav ----
+  $("#catNav").innerHTML = CONFIG.menu.map((c,i)=>
+    `<button class="chip ${i===0?'active':''}" data-cat="${i}">${c.cat}</button>`).join("");
+  $$("#catNav .chip").forEach(ch=>ch.onclick=()=>{
+    const el = $("#cat"+ch.dataset.cat);
+    if(el) window.scrollTo({top:el.offsetTop-70,behavior:"smooth"});
+  });
+
+  // ---- Menu render ----
+  $("#menu").innerHTML = CONFIG.menu.map((c,ci)=>`
+    <section id="cat${ci}">
+      <h2 class="cat-title">${c.cat}</h2>
+      ${c.note?`<p class="cat-note">${c.note}</p>`:`<div style="height:8px"></div>`}
+      ${c.items.map(it=>`
+        <div class="item" data-id="${it.id}">
+          <div class="item-body">
+            <p class="item-name">${it.veg?'<span class="veg"></span>':''}${it.name}${it.spicy?'<span class="spicy">🌶 spicy</span>':''}</p>
+            ${it.desc?`<p class="item-desc">${it.desc}</p>`:''}
+            <p class="item-price"><span class="cur">${cur}</span>${it.price.toLocaleString("en-PK")}</p>
+          </div>
+          <div class="item-add" data-add="${it.id}"></div>
+        </div>`).join("")}
+    </section>`).join("");
+
+  function renderAdd(id){
+    const slot = $(`[data-add="${id}"]`); if(!slot) return;
+    const q = cart[id]||0;
+    if(q===0){
+      slot.innerHTML = `<button class="add-btn">Add</button>`;
+      slot.firstChild.onclick = ()=>{ cart[id]=1; renderAdd(id); sync(); };
+    } else {
+      slot.innerHTML = `<div class="stepper">
+        <button data-m="-">−</button><span class="qty">${q}</span><button data-m="+">+</button></div>`;
+      slot.querySelector('[data-m="-"]').onclick = ()=>{ cart[id]=q-1; if(cart[id]<=0)delete cart[id]; renderAdd(id); sync(); };
+      slot.querySelector('[data-m="+"]').onclick = ()=>{ cart[id]=q+1; renderAdd(id); sync(); };
+    }
+  }
+  Object.keys(ITEMS).forEach(renderAdd);
+
+  // ---- scrollspy for chips ----
+  const sections = CONFIG.menu.map((_,i)=>$("#cat"+i));
+  let ticking=false;
+  window.addEventListener("scroll",()=>{
+    if(ticking)return; ticking=true;
+    requestAnimationFrame(()=>{
+      let idx=0;
+      sections.forEach((s,i)=>{ if(s.getBoundingClientRect().top<=120) idx=i; });
+      $$("#catNav .chip").forEach((c,i)=>c.classList.toggle("active",i===idx));
+      ticking=false;
+    });
+  },{passive:true});
+
+  // ---- totals ----
+  const totals = ()=>{
+    let n=0,sum=0;
+    for(const id in cart){ n+=cart[id]; sum+=cart[id]*ITEMS[id].price; }
+    return {n,sum};
+  };
+  function sync(){
+    const {n,sum}=totals();
+    $("#cbCount").textContent = n+" item"+(n!==1?"s":"");
+    $("#cbTotal").textContent = money(sum);
+    $("#cartBar").classList.toggle("show", n>0);
+    if($("#sheet").classList.contains("show")) renderSheet();
+  }
+
+  // ---- sheet open/close ----
+  const sheet=$("#sheet"), scrim=$("#scrim");
+  function openSheet(){ renderSheet(); sheet.classList.add("show"); scrim.classList.add("show"); document.body.style.overflow="hidden"; }
+  function closeSheet(){ sheet.classList.remove("show"); scrim.classList.remove("show"); document.body.style.overflow=""; }
+  $("#cartBarInner").querySelector(".cb-go").onclick=openSheet;
+  $("#closeSheet").onclick=closeSheet;
+  scrim.onclick=closeSheet;
+
+  // ---- cart / checkout render ----
+  function renderSheet(){
+    const {n,sum}=totals();
+    const body=$("#sheetBody");
+    if(n===0){
+      $("#sheetTitle").textContent="Your order";
+      body.innerHTML=`<div class="empty"><div class="e-ic">🍽️</div>
+        <p>Your order is empty.<br>Add a few dishes to get started.</p></div>`;
+      return;
+    }
+    $("#sheetTitle").textContent="Your order";
+    const type = CONFIG.orderTypes.find(t=>t.id===activeType);
+    const lines = Object.keys(cart).map(id=>{
+      const it=ITEMS[id], q=cart[id];
+      return `<div class="line" data-line="${id}">
+        <div class="line-body">
+          <p class="line-name">${it.name}</p>
+          <p class="line-price">${money(it.price)} each</p>
+        </div>
+        <div class="mini-step">
+          <button data-d="-">−</button><span class="q">${q}</span><button data-d="+">+</button>
+        </div>
+        <span class="line-sub">${money(it.price*q)}</span>
+      </div>`;
+    }).join("");
+
+    body.innerHTML = lines + `
+      <div class="form-grp">
+        <label>Order type</label>
+        <div style="font-weight:600;color:var(--forest);font-size:14px;padding:4px 0">
+          ${type.icon} ${type.label}
+        </div>
+      </div>
+      <div class="form-grp">
+        <label>Your name <span class="req">*</span></label>
+        <input class="field" id="fName" placeholder="Full name" autocomplete="name">
+      </div>
+      <div class="form-grp">
+        <label>Phone number <span class="req">*</span></label>
+        <input class="field" id="fPhone" type="tel" placeholder="03xx xxxxxxx" autocomplete="tel">
+      </div>
+      ${type.field?`
+      <div class="form-grp">
+        <label>${type.field} <span class="req">*</span></label>
+        <input class="field" id="fLoc" placeholder="${type.fieldHint}">
+      </div>`:''}
+      <div class="form-grp">
+        <label>Notes for the kitchen</label>
+        <textarea class="field" id="fNotes" placeholder="Allergies, less spicy, cutlery, time to serve…"></textarea>
+      </div>
+      <div class="summary">
+        <div class="sum-row"><span>Items (${n})</span><span>${money(sum)}</span></div>
+        <div class="sum-row total"><span>Total</span><span>${money(sum)}</span></div>
+      </div>
+      <button class="place-btn" id="placeBtn">
+        Place order · ${money(sum)}
+      </button>
+      <p class="field-hint" style="text-align:center;margin-top:10px">
+        ${LIVE?"You'll get a confirmation on screen. Our team is notified instantly.":"Demo mode — connect your Google Sheet to receive real orders."}
+      </p>`;
+
+    body.querySelectorAll(".line").forEach(ln=>{
+      const id=ln.dataset.line;
+      ln.querySelector('[data-d="-"]').onclick=()=>{ cart[id]--; if(cart[id]<=0)delete cart[id]; renderAdd(id); sync(); };
+      ln.querySelector('[data-d="+"]').onclick=()=>{ cart[id]++; renderAdd(id); sync(); };
+    });
+    $("#placeBtn").onclick=submitOrder;
+  }
+
+  // ---- submit ----
+  async function submitOrder(){
+    const name=$("#fName"), phone=$("#fPhone"), locEl=$("#fLoc");
+    let ok=true;
+    [name,phone,locEl].forEach(f=>f&&f.classList.remove("err"));
+    if(!name.value.trim()){ name.classList.add("err"); ok=false; }
+    if(!phone.value.trim()){ phone.classList.add("err"); ok=false; }
+    if(locEl && !locEl.value.trim()){ locEl.classList.add("err"); ok=false; }
+    if(!ok){ (name.value.trim()?phone:name).focus(); return; }
+
+    const type=CONFIG.orderTypes.find(t=>t.id===activeType);
+    const {sum}=totals();
+    const orderNo = "PR-" + Date.now().toString().slice(-6);
+    const itemsList = Object.keys(cart).map(id=>`${cart[id]}× ${ITEMS[id].name} (${money(ITEMS[id].price*cart[id])})`).join("; ");
+
+    const payload = {
+      orderNumber: orderNo,
+      orderType: type.label,
+      location: locEl ? locEl.value.trim() : "Takeaway",
+      name: name.value.trim(),
+      phone: phone.value.trim(),
+      items: itemsList,
+      total: sum,
+      notes: ($("#fNotes").value||"").trim(),
+      placedAt: new Date().toLocaleString("en-PK",{timeZone:"Asia/Karachi"})
+    };
+
+    const btn=$("#placeBtn");
+    btn.disabled=true; btn.innerHTML=`<span class="spinner"></span> Sending…`;
+
+    try{
+      if(LIVE){
+        await fetch(CONFIG.endpoint,{
+          method:"POST",
+          // text/plain keeps it a "simple" request → no CORS preflight with Apps Script
+          headers:{"Content-Type":"text/plain;charset=utf-8"},
+          body: JSON.stringify(payload)
+        });
+      } else {
+        await new Promise(r=>setTimeout(r,700)); // simulate
+      }
+      showSuccess(orderNo);
+    }catch(err){
+      btn.disabled=false;
+      btn.innerHTML=`Place order · ${money(sum)}`;
+      alert("We couldn't send your order — please check your connection and try again.");
+    }
+  }
+
+  function showSuccess(orderNo){
+    for(const id in cart) delete cart[id];
+    Object.keys(ITEMS).forEach(renderAdd);
+    $("#sheetTitle").textContent="Order placed";
+    $("#sheetBody").innerHTML=`
+      <div class="success">
+        <div class="check">✓</div>
+        <h2>Thank you!</h2>
+        <p>Your order has been received.</p>
+        <p>Our team will have it to you shortly.</p>
+        <div><span class="ordernum">${orderNo}</span></div>
+        ${LIVE?'':'<div><span class="demo-tag">Demo mode — not saved. Connect your sheet to go live.</span></div>'}
+      </div>
+      <button class="place-btn" id="doneBtn" style="background:var(--gold);color:var(--forest-deep)">Done</button>`;
+    $("#doneBtn").onclick=()=>{ closeSheet(); $("#cartBar").classList.remove("show"); sync(); };
+  }
+
+  // ---- QR code ----
+  const qrCard=$("#qrCard");
+  $("#qrToggle").onclick=()=>{
+    const showing=qrCard.classList.toggle("show");
+    $("#qrToggle").textContent = showing ? "Hide QR code" : "Show QR code for this page";
+    if(showing && !$("#qrcode").hasChildNodes()){
+      const url = window.location.href.split("#")[0];
+      new QRCode($("#qrcode"),{text:url,width:200,height:200,
+        colorDark:"#1f3d2b",colorLight:"#ffffff",correctLevel:QRCode.CorrectLevel.M});
+    }
+    if(showing) qrCard.scrollIntoView({behavior:"smooth",block:"center"});
+  };
+  $("#qrPrint").onclick=()=>window.print();
+  $("#qrCopy").onclick=async()=>{
+    try{ await navigator.clipboard.writeText(window.location.href.split("#")[0]);
+      $("#qrCopy").textContent="Copied ✓"; setTimeout(()=>$("#qrCopy").textContent="Copy link",1500);
+    }catch(e){ alert(window.location.href); }
+  };
+
+  sync();
+})();
+</script>
+</body>
+</html>
